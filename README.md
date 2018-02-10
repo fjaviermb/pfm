@@ -6,7 +6,7 @@ A set of scripts to prepare raw data from original dataset. Current tools/script
 
 - **install.sh**: create links in Linux binary directory: "/usr/bin"
 - **pcap_generate_week**: extract a week and adds in raw directory. Usage:
-   ```shell
+   ```
    pcap_generate_week.sh -w 1 -m training -y 1999 -t inside -d monday
    ```
 - **pcap_tcpdump/pcap_tcpdump_extended**: show contents from capture in tcpdump binary format. Extended shows more fields.
@@ -18,6 +18,15 @@ A set of scripts to prepare raw data from original dataset. Current tools/script
 ```shell
 sudo yum install wireshark
 sudo usermod -a -G wireshark nuctools
+sudo reboot
+```
+
+"rstudio"
+```shell
+wget https://download1.rstudio.org/rstudio-1.1.423-x86_64.rpm
+#https://www.rstudio.com/products/rpackages/devtools/
+sudo yum install R R-dev
+sudo rpm -i rstudio-1.1.423-x86_64.rpm
 ```
 
 **Configuration**
