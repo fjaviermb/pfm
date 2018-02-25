@@ -1,5 +1,32 @@
 # pfm
 
+## Dataset
+
+Currently content:
+
+``
+./week1/1999_training_week1_thursday_inside.tcpdump.gz
+./week1/1999_training_week1_monday_inside.tcpdump.gz
+./week1/1999_training_week1_wednesday_inside.tcpdump.gz
+./week1/1999_training_week1_friday_inside.tcpdump.gz
+./week1/1999_training_week1_tuesday_inside.tcpdump.gz
+./week2/1999_training_week2_thursday_inside.tcpdump.gz
+
+./week2/1999_training_week2_tuesday_inside.tcpdump.gz
+./week2/1999_training_week2_monday_inside.tcpdump.gz
+./week2/1999_training_week2_wednesday_inside.tcpdump.gz
+./week2/1999_training_week2_friday_inside.tcpdump.gz
+
+./week3/1999_training_week3_monday_inside.tcpdump.gz
+./week3/1999_training_week3_thursday_inside.tcpdump.gz
+./week3/1999_training_week3_extra_monday_inside.tcpdump.gz
+./week3/1999_training_week3_extra_tuesday_inside.tcpdump.gz
+./week3/1999_training_week3_tuesday_inside.tcpdump.gz
+./week3/1999_training_week3_friday_inside.tcpdump.gz
+./week3/1999_training_week3_wednesday_inside.tcpdump.gz
+./week3/1999_training_week3_extra_wednesday_inside.tcpdump.gz
+```
+
 ## Tools/capture
 
 A set of scripts to prepare raw data from original dataset. Current tools/scripts:
@@ -9,6 +36,13 @@ A set of scripts to prepare raw data from original dataset. Current tools/script
    ```
    pcap_generate_week.sh -w 1 -m training -y 1999 -t inside -d monday
    ```
+   Options:
+   - **w|week**: week to recover from dataset
+   - **m|mode**: logical algorithm mode: training, evaluation
+   - **d|day**:  day pof the week
+   - **y|year**: year of the dataset
+   - **t|type**: inside or outside (depends on dataset)
+   
 - **pcap_tcpdump/pcap_tcpdump_extended**: show contents from capture in tcpdump binary format. Extended shows more fields.
 - **pacap_tcpick**: show information from a capture. Only valid for TCP packets
 - **tshark_export**:  export selected fields from a capture in tcpdump binay format. Exported fields are: ip.proto,eth.dst eth.type,eth.len,th.src,icmp.checksum, icmp.code, icmp.type, ip.checksum, ip.dst, ip.fragment, ip.frag_offset, ip.hdr_len, ip.len, ip.src, ip.tos, ip.ttl, tcp.ack, tcp.checksum, tcp.dstport, tcp.flags, tcp.hdr_len, tcp.options, tcp.seq, tcp.srcport, tcp.urgent_pointer, tcp.window_size, udp.checksum, udp.dstport, udp.length, udp.srcport
