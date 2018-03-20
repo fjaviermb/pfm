@@ -99,4 +99,4 @@ sudo rpm -i rstudio-1.1.423-x86_64.rpm
 ```
 
 ### Running code
-In thecurrent edvelopment, the entry point (main function) is on "code/main.R"
+In the current edvelopment, the entry point (main function) is on "workspace/code/main.R"
