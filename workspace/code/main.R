@@ -41,27 +41,41 @@ library("tidyr")
 # Clear environment
 rm(list=ls())
 
-rootDir <- "~/git-repos/pfm/workspace/code"
-
+root.dir <- "~/git-repos/pfm/workspace/code"
+#https://stackoverflow.com/questions/12642651/in-r-how-to-get-error-messages-in-english
+## English messages
+Sys.setlocale("LC_MESSAGES", "C")
 
 # Load scripts
-source(paste(rootDir,"input/inputLoader.R",sep="/"))
+source(paste(root.dir,"input/inputLoader.R",sep="/"))
+source(paste(root.dir,"util/clusterer.R",sep="/"))
+source(paste(root.dir,"phad-c32.R",sep="/"))
 
-INPUT_DS_RAW_DIR <-paste(rootDir,"../raw",sep="/")
+# Saving cache
+# root.dir <- "~/git-repos/pfm/workspace/code"
+# input.dir <- paste(root.dir,'cache',sep='/')
 
+# model.ds.cache <- model.ds
+# file.name <- 'model.ds.cache.RData'
+# file.fullname <- paste( input.dir,file.name,sep="/")
+# save(model.ds.cache,file = file.fullname)
 
+# training.raw.ds.cache <- dataset.entries
+# file.name <- 'training.raw.ds.cache.RData'
+# file.fullname <- paste( input.dir,file.name,sep="/")
+# save(training.raw.ds.cache,file = file.fullname)
 
-# 1 Load official cve/cpes
-#downloadSysdata(INPUT_SECURITY_DIR)
-#load("~/workspace/gitrepos/repos/PracticaDDS/input/sysdata.rda")
+# testing.raw.ds.cache <- testing.raw.ds
+# file.name <- 'testing.raw.ds.cache.RData'
+# file.fullname <- paste( input.dir,file.name,sep="/")
+# save(testing.raw.ds.cache,file = file.fullname)
 
-# All CVEs/CPEs. Take care of that, a lot of data is loaded
-#cves <- netsec.data$datasets$cves
-#cpes <- netsec.data$datasets$cpes
+# Load tranining data
+training.raw.ds <- loadTrainingDataset(cache = TRUE, root.dir)
 
-# Only load a sample from all CVEs/CPEs.
-#cpes <- net.security::GetDataFrame("cpes") 
-#cves <- net.security::GetDataFrame("cves")
+# Calculate model
+model.ds <- train(dataset.entries, cache = TRUE, root.dir)
 
-# 2 Collect data from PCs
-dataset.entries <- loadDataset(INPUT_DS_RAW_DIR)
+# Load tranining data
+testing.raw.ds <- loadTestingDataset(cache = TRUE, root.dir )
+

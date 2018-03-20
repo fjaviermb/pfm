@@ -1,10 +1,6 @@
 # Clusterer version of python one from ml-ids project (https://github.com/lukehsiao/ml-ids/blob/master/utils/clusterer.py)
 library(R6)
 
-# Required: install.packages("hashmap")
-# Soporte hashmap
-# https://cran.r-project.org/web/packages/hashmap/README.html
-
 # 'Data structure for clustering continuous data.
 
 # 'Data structure for use in PHAD-C. Stores a list of ranges or clusters up to
