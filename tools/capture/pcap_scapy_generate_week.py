@@ -1,4 +1,5 @@
 from scapy.all import *
+import getopt, sys
 
 # Capture python script. Read gzipped tcpdump files and exports to CSV file using pipe as field/column/value separator
 # This code is based on and use code from ml-ids project by Luke (https://github.com/lukehsiao/ml-ids)
@@ -12,6 +13,7 @@ PROTO_TCP = 6
 PROTO_UDP = 17
 
 FEATURES = [
+    'Timestamp',
     'Ethernet_size',
     'Ethernet_dstHi',
     'Ethernet_dstLow',
@@ -222,7 +224,8 @@ def main(argv):
 
         pkt = parse_pkt(pkt_bytes1)
 
-        # Init
+        # Initialization
+	register['Timestamp']=None
         register['Ethernet_size']=None
         register['Ethernet_dstHi']=None
         register['Ethernet_dstLow']=None
@@ -256,6 +259,11 @@ def main(argv):
         register['UDP_dport']=None
         register['UDP_length']=None
         register['UDP_chksum']=None
+
+	# Add timestamp
+	#register['Timestamp'] = (float(epoch) * float(1000000)) + float(usec)
+	register['Timestamp'] = str(epoch) + str(usec).zfill(6)
+
 
         # Fill Ethernet fields
         #register['Ethernet_size'] = pkt['Ethernet']['size']
@@ -310,7 +318,7 @@ def main(argv):
                 register[key] = str(register[key])
 
         if pkt['Ethernet']['type'] == TYPE_IPV4 and ( pkt['IPv4']['proto'] == PROTO_TCP or pkt['IPv4']['proto'] == PROTO_UDP or pkt['IPv4']['proto'] == PROTO_ICMP):
-               print( register['Ethernet_size'] + separator+ register['Ethernet_dstHi'] + separator+ register['Ethernet_dstLow'] + separator+ register['Ethernet_srcHi'] + separator+ register['Ethernet_srcLow'] + separator+ register['Ethernet_type'] + separator+ register['IPv4_ihl'] + separator+ register['IPv4_tos'] + separator+ register['IPv4_length'] + separator+ register['IPv4_id'] + separator+ register['IPv4_offset'] + separator+ register['IPv4_ttl'] + separator+ register['IPv4_proto'] + separator+ register['IPv4_chksum'] + separator+ register['IPv4_src'] + separator+ register['IPv4_dst'] + separator+ register['ICMP_type'] + separator+ register['ICMP_code'] + separator+ register['ICMP_chksum'] + separator+ register['TCP_sport'] + separator+ register['TCP_dport'] + separator+ register['TCP_seqNo'] + separator+ register['TCP_ackNo'] + separator+ register['TCP_dataOffset'] + separator+ register['TCP_flags'] + separator+ register['TCP_window'] + separator+ register['TCP_chksum'] + separator+ register['TCP_urgPtr'] + separator+ register['TCP_options'] + separator+ register['UDP_sport'] + separator+ register['UDP_dport'] + separator+ register['UDP_length'] + separator+ register['UDP_chksum'] )
+               print( register['Timestamp'] + separator + register['Ethernet_size'] + separator+ register['Ethernet_dstHi'] + separator+ register['Ethernet_dstLow'] + separator+ register['Ethernet_srcHi'] + separator+ register['Ethernet_srcLow'] + separator+ register['Ethernet_type'] + separator+ register['IPv4_ihl'] + separator+ register['IPv4_tos'] + separator+ register['IPv4_length'] + separator+ register['IPv4_id'] + separator+ register['IPv4_offset'] + separator+ register['IPv4_ttl'] + separator+ register['IPv4_proto'] + separator+ register['IPv4_chksum'] + separator+ register['IPv4_src'] + separator+ register['IPv4_dst'] + separator+ register['ICMP_type'] + separator+ register['ICMP_code'] + separator+ register['ICMP_chksum'] + separator+ register['TCP_sport'] + separator+ register['TCP_dport'] + separator+ register['TCP_seqNo'] + separator+ register['TCP_ackNo'] + separator+ register['TCP_dataOffset'] + separator+ register['TCP_flags'] + separator+ register['TCP_window'] + separator+ register['TCP_chksum'] + separator+ register['TCP_urgPtr'] + separator+ register['TCP_options'] + separator+ register['UDP_sport'] + separator+ register['UDP_dport'] + separator+ register['UDP_length'] + separator+ register['UDP_chksum'] )
 
 
 if __name__ == "__main__":
