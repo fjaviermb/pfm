@@ -2,43 +2,51 @@
 
 ## Dataset
 
-Currently content:
+   The dataset used is the 1999 DARPA Intrusion detection from Lincoln Laboratory (MIT - https://www.ll.mit.edu/ideval/data/1999data.html)
 
-``
-./week1/1999_training_week1_thursday_inside.tcpdump.gz
-./week1/1999_training_week1_monday_inside.tcpdump.gz
-./week1/1999_training_week1_wednesday_inside.tcpdump.gz
-./week1/1999_training_week1_friday_inside.tcpdump.gz
-./week1/1999_training_week1_tuesday_inside.tcpdump.gz
-./week2/1999_training_week2_thursday_inside.tcpdump.gz
+    ** Training: week three (inside traffic).
+    ** Testing: weeks four and five (inside traffic).
 
-./week2/1999_training_week2_tuesday_inside.tcpdump.gz
-./week2/1999_training_week2_monday_inside.tcpdump.gz
-./week2/1999_training_week2_wednesday_inside.tcpdump.gz
-./week2/1999_training_week2_friday_inside.tcpdump.gz
-
-./week3/1999_training_week3_monday_inside.tcpdump.gz
-./week3/1999_training_week3_thursday_inside.tcpdump.gz
-./week3/1999_training_week3_extra_monday_inside.tcpdump.gz
-./week3/1999_training_week3_extra_tuesday_inside.tcpdump.gz
-./week3/1999_training_week3_tuesday_inside.tcpdump.gz
-./week3/1999_training_week3_friday_inside.tcpdump.gz
-./week3/1999_training_week3_wednesday_inside.tcpdump.gz
-./week3/1999_training_week3_extra_wednesday_inside.tcpdump.gz
+   Using the scripts below, to extract "text" data from tcpdmup binary capture files, the following commands are launched:
+      
+```
+# TRAINING
+pcap_scapy_generate_week.sh -w 3 -m training -y 1999 -t inside -s \| -d friday
+pcap_scapy_generate_week.sh -w 3 -m training -y 1999 -t inside -s \| -d monday
+pcap_scapy_generate_week.sh -w 3 -m training -y 1999 -t inside -s \| -d tuesday
+pcap_scapy_generate_week.sh -w 3 -m training -y 1999 -t inside -s \| -d thursday
+pcap_scapy_generate_week.sh -w 3 -m training -y 1999 -t inside -s \| -d wednesday
+pcap_scapy_generate_week.sh -w 3 -m training -y 1999 -t inside -s \| -d friday
+pcap_scapy_generate_week.sh -w 3 -m training -y 1999 -t inside -s \| -d extra_monday
+pcap_scapy_generate_week.sh -w 3 -m training -y 1999 -t inside -s \| -d extra_wednesday
+pcap_scapy_generate_week.sh -w 3 -m training -y 1999 -t inside -s \| -d extra_tuesday
 ```
 
-## Tools/capture
+```
+# TESTING/EVALUATION
+pcap_scapy_generate_week.sh -w 4 -m testing -y 1999 -t inside -s \| -d monday
+pcap_scapy_generate_week.sh -w 4 -m testing -y 1999 -t inside -s \| -d wednesday
+pcap_scapy_generate_week.sh -w 4 -m testing -y 1999 -t inside -s \| -d thursday
+pcap_scapy_generate_week.sh -w 4 -m testing -y 1999 -t inside -s \| -d friday
+pcap_scapy_generate_week.sh -w 5 -m testing -y 1999 -t inside -s \| -d monday
+pcap_scapy_generate_week.sh -w 5 -m testing -y 1999 -t inside -s \| -d tuesday
+pcap_scapy_generate_week.sh -w 5 -m testing -y 1999 -t inside -s \| -d wednesday
+pcap_scapy_generate_week.sh -w 5 -m testing -y 1999 -t inside -s \| -d thursday
+pcap_scapy_generate_week.sh -w 5 -m testing -y 1999 -t inside -s \| -d friday
+```
+
+## Capure/ingestion tools
 
 A set of scripts to prepare raw data from original dataset. Current tools/scripts:
 
 - **install.sh**: create links in Linux binary directory: "/usr/bin"
-- **pcap_generate_week**: extract a week and adds in raw directory. Usage:
+- **pcap_scapy_generate_week**: extract a week and adds in raw directory. Usage:
    ```
-   pcap_generate_week.sh -w 1 -m training -y 1999 -t inside -d monday
+   pcap_scapy_generate_week.sh -w 1 -m training -y 1999 -t inside -d monday
    ```
    Options:
    - **w|week**: week to recover from dataset
-   - **m|mode**: logical algorithm mode: training, evaluation
+   - **m|mode**: logical algorithm mode: training, testing
    - **d|day**:  day pof the week
    - **y|year**: year of the dataset
    - **t|type**: inside or outside (depends on dataset)
@@ -53,14 +61,6 @@ A set of scripts to prepare raw data from original dataset. Current tools/script
 sudo yum install wireshark
 sudo usermod -a -G wireshark nuctools
 sudo reboot
-```
-
-"rstudio"
-```shell
-wget https://download1.rstudio.org/rstudio-1.1.423-x86_64.rpm
-#https://www.rstudio.com/products/rpackages/devtools/
-sudo yum install R R-dev
-sudo rpm -i rstudio-1.1.423-x86_64.rpm
 ```
 
 **Configuration**
@@ -86,6 +86,17 @@ sudo sh install.sh
 ```
 
 
+## Trainig and evaluation runtime
 
+Current code is being developed using R and RStudio is used as R IDE (you can use whatever you want).
 
+### Installing RStudio on CentOS 7
+```shell
+wget https://download1.rstudio.org/rstudio-1.1.423-x86_64.rpm
+#https://www.rstudio.com/products/rpackages/devtools/
+sudo yum install R R-dev
+sudo rpm -i rstudio-1.1.423-x86_64.rpm
+```
 
+### Running code
+In thecurrent edvelopment, the entry point (main function) is on "code/main.R"
