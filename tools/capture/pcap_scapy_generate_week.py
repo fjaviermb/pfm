@@ -161,6 +161,9 @@ def parse_udp(pkt_bytes):
 # This code is from ml-ids project: https://github.com/lukehsiao/ml-ids/blob/master/utils/pcap_parser.py
 # END
 
+# Adjust the time in order to be in the same time zone as the docmentation in the dataset
+ADJUSTMENT_TIME = -5 * 3600
+
 def mac2str(mac_hi,mac_low):
     mac_arr = [mac_hi,mac_low]
     mac_str =''.join('{:06X}'.format(mac_dec) for mac_dec in mac_arr)
@@ -262,7 +265,7 @@ def main(argv):
 
 	# Add timestamp
 	#register['Timestamp'] = (float(epoch) * float(1000000)) + float(usec)
-	register['Timestamp'] = str(epoch) + str(usec).zfill(6)
+	register['Timestamp'] = str(epoch + ADJUSTMENT_TIME) + str(usec).zfill(6)
 
 
         # Fill Ethernet fields

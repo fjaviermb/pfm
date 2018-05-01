@@ -43,3 +43,7 @@ createLink pcap_tshark_export.sh
 createLink pcap_tshark_export_stream.sh
 createLink pcap_scapy_generate_week.sh
 createLink pcap_scapy_generate_week.py
+createLink pmaster_generate.py
+createLink pmaster_generate.sh
+
+
