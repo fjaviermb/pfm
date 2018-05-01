@@ -64,3 +64,19 @@ loadCacheTestingRaw <- function(root.dir=getwd()) {
   
 }
 
+loadCacheLabelAttackListRaw <- function(root.dir=getwd()) {
+  
+  input.dir <- paste(root.dir,'cache',sep='/')
+  file.name <- 'label.attacklist.raw.ds.cache.RData'
+  file.fullname <- paste( input.dir,file.name,sep="/")
+  
+  if(file.exists(file.fullname)) {
+    load(file = file.fullname)
+  } else {
+    return(NULL);
+  }
+  
+  return(label.attacklist.raw.ds.cache)
+  
+}
+
