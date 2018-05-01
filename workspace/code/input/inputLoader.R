@@ -72,13 +72,10 @@ loadLabelAttackList <- function(cache = FALSE, root.dir=getwd()) {
     
   } else {
     
-    
     #  Path containing dataset input files
     input.dir <- getRawDir(root.dir)
     
     for (file in list.files(input.dir, pattern = PATTERN_ATTACK_LIST)) {
-      
-      
       
       label.attacklist.raw.ds <- read.csv(paste(input.dir,file,sep="/"),header=FALSE,sep="|",stringsAsFactors = FALSE,
                                           colClasses=c("character","double","double","double","character","character")
@@ -86,10 +83,12 @@ loadLabelAttackList <- function(cache = FALSE, root.dir=getwd()) {
       
     }
     
+    if( ! exists("label.attacklist.raw.ds") ) {
+      print(paste("WARNING: No label attack files found, creating an empty vector (input directory[",input.dir,"]"))
+      label.attacklist.raw.ds <- c("0","0",0,0,0,"0")
+    }
     
     names(label.attacklist.raw.ds) <- c("id","dstIP","starttime","endtime","destIPstr","name");
-    
-    
     
   }  
   
@@ -166,8 +165,11 @@ loadDataset <- function(input.dir, pattern=".*") {
     
     rnorm(1000,0,1)
     toc()
-    
-    
+  
+  }
+  
+  if( !exists( "all.dataset.entries" ) ) {
+    print(paste("Error, no files found in [",input.dir,"] with PATTERN [",pattern,"]"))
   }
   
   names(all.dataset.entries) <- c("dt.year","dt.mode","dt.week","dt.day","dt.type","timestamp","eth.size","eth.dstHi","eth.dstLow","eth.srcHi","eth.srcLow","eth.type","ip.ihl","ip.tos","ip.length","ip.id","ip.offset","ip.ttl","ip.proto","ip.chksum","ip.src","ip.dst","icmp.type","icmp.code","icmp.chksum","tcp.sport","tcp.dport","tcp.seqNo","tcp.ackNo","tcp.dataOffset","tcp.flags","tcp.window","tcp.chksum","tcp.urgPtr","tcp.options","udp.sport","udp.dport","udp.length","udp.chksum") 
