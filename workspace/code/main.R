@@ -33,6 +33,8 @@ packages<-function(x){
 # detach("package:sets", unload=TRUE)
 # install.packages("dplyr")
 # install.packages("tidyr")
+# install.packages("tictoc")
+# install.packages("hash")
 library("dplyr")
 library("tidyr")
 
@@ -41,41 +43,36 @@ library("tidyr")
 # Clear environment
 rm(list=ls())
 
-root.dir <- "~/git-repos/pfm/workspace/code"
+# Should be the "code" folder
+root.dir <- paste(getwd(),"code", sep="/")
+
 #https://stackoverflow.com/questions/12642651/in-r-how-to-get-error-messages-in-english
 ## English messages
 Sys.setlocale("LC_MESSAGES", "C")
+
+#https://stackoverflow.com/questions/9397664/force-r-not-to-use-exponential-notation-e-g-e10
+## Avoid scientific representation. This option aids to print R command to display a number in scientific/exponential representation or not
+options("scipen"=100, "digits"=4)
 
 # Load scripts
 source(paste(root.dir,"input/inputLoader.R",sep="/"))
 source(paste(root.dir,"util/clusterer.R",sep="/"))
 source(paste(root.dir,"phad-c32.R",sep="/"))
 
-# Saving cache
-# root.dir <- "~/git-repos/pfm/workspace/code"
-# input.dir <- paste(root.dir,'cache',sep='/')
-
-# model.ds.cache <- model.ds
-# file.name <- 'model.ds.cache.RData'
-# file.fullname <- paste( input.dir,file.name,sep="/")
-# save(model.ds.cache,file = file.fullname)
-
-# training.raw.ds.cache <- dataset.entries
-# file.name <- 'training.raw.ds.cache.RData'
-# file.fullname <- paste( input.dir,file.name,sep="/")
-# save(training.raw.ds.cache,file = file.fullname)
-
-# testing.raw.ds.cache <- testing.raw.ds
-# file.name <- 'testing.raw.ds.cache.RData'
-# file.fullname <- paste( input.dir,file.name,sep="/")
-# save(testing.raw.ds.cache,file = file.fullname)
+# Load master attack list
+label.attacklist.raw.ds <- loadLabelAttackList(cache = TRUE, root.dir)
 
 # Load tranining data
 training.raw.ds <- loadTrainingDataset(cache = TRUE, root.dir)
 
 # Calculate model
-model.ds <- train(dataset.entries, cache = TRUE, root.dir)
+model.ds <- train(training.raw.ds, cache = TRUE, root.dir)
 
 # Load tranining data
 testing.raw.ds <- loadTestingDataset(cache = TRUE, root.dir )
 
+# label.testing.raw.ds <- labelTestingDS(testing.raw.ds, label.attacklist.raw.ds)
+
+#testing.raw.ds %>% filter( timestamp >= 922677515) %>% filter( timestamp <= 922677762)
+#scoresAll <- scoring(model.ds,testing.raw.ds, label.testing.raw.ds, FALSE, root.dir)
+#scoresAll <- scoringAggregate(model.ds,testing.raw.ds, label.testing.raw.ds, TRUE, root.dir)

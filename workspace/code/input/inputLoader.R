@@ -1,8 +1,11 @@
 library("tidyr")
+require(tictoc)
 source(paste(root.dir,"cache/cacheLoader.R",sep="/"))
 
 PATTERN_TRAINING <- ".*training.*"
 PATTERN_TESTING <- ".*testing.*"
+#PATTERN_TESTING <- "1999_testing_week4_monday_inside.csv"
+PATTERN_ATTACK_LIST <- "master-listfile-condensed.csv"
 INPUT_RAW_DIR <- "raw"
 
 
@@ -21,7 +24,7 @@ loadTrainingDataset <- function(cache = FALSE, root.dir=getwd()) {
     
   } else {
     
-    training.raw.ds <- loadDataset(getRawDir(root.dir), PATTERN_TRAINING, cache, root.dir)
+    training.raw.ds <- loadDataset(getRawDir(root.dir), PATTERN_TRAINING)
     
   }
   
@@ -31,14 +34,15 @@ loadTrainingDataset <- function(cache = FALSE, root.dir=getwd()) {
 
 #' Load testing dataset
 loadTestingDataset <- function(cache = FALSE, root.dir = getwd() ) {
-
+  
   if( cache ) {
     
     testing.raw.ds <- loadCacheTestingRaw(root.dir) 
     
   } else {
     
-    testing.raw.ds <- loadDataset(getRawDir(root.dir), PATTERN_TESTING, cache, root.dir)
+    testing.raw.ds.tmp <- loadDataset(getRawDir(root.dir), PATTERN_TESTING)
+    testing.raw.ds <- testing.raw.ds.tmp %>% arrange(timestamp)
     
   }
   
@@ -46,6 +50,52 @@ loadTestingDataset <- function(cache = FALSE, root.dir = getwd() ) {
   
 }
 
+#' Load attack list to mark an entry as an attack or not during the testing phase
+#' 
+#' @description Read file containing entries considered as attacks. Unique file as a CSV file. The file format is:
+#'
+#'    Column01: id		      Entry id as float.
+#'    Column02: dstIP		    Destination IP as long format.
+#'    Column03: starttime		Timestamp when the attack starts.
+#'    Column04: endtime		  Timestamp when the attack ends.
+#'    Column05: destIPstr		Destination IP as string/literal using 4 decimals separate using "." (just the same as dstIP but different format)
+#'    Column06: name	      Attack name
+#'    
+#' @example: loadDataset input/file...
+#' @param cache     Do not do any calculation, use precalculated data
+#' @param root.dir  Workspace root directory used to load cached data
+loadLabelAttackList <- function(cache = FALSE, root.dir=getwd()) {
+  
+  if( cache ) {
+    
+    label.attacklist.raw.ds <- loadCacheLabelAttackListRaw(root.dir) 
+    
+  } else {
+    
+    
+    #  Path containing dataset input files
+    input.dir <- getRawDir(root.dir)
+    
+    for (file in list.files(input.dir, pattern = PATTERN_ATTACK_LIST)) {
+      
+      
+      
+      label.attacklist.raw.ds <- read.csv(paste(input.dir,file,sep="/"),header=FALSE,sep="|",stringsAsFactors = FALSE,
+                                          colClasses=c("character","double","double","double","character","character")
+      )
+      
+    }
+    
+    
+    names(label.attacklist.raw.ds) <- c("id","dstIP","starttime","endtime","destIPstr","name");
+    
+    
+    
+  }  
+  
+  return(label.attacklist.raw.ds)
+  
+}
 
 
 #' Load dataset from all files included in the input.dir path
@@ -94,33 +144,33 @@ loadTestingDataset <- function(cache = FALSE, root.dir = getwd() ) {
 #
 #' @example: loadDataset input/file...
 #' @param input.dir Path containing dataset input files
-#' @param cache     Do not do any calculation, use precalculated data
 #' @param root.dir  Workspace root directory used to load cached data
 #' @param pattern   Filer fiels in raw directory. Default: all files pattern (.*)
-loadDataset <- function(input.dir, pattern=".*", cache = FALSE, root.dir=getwd()) {
-  if( cache ) {
+loadDataset <- function(input.dir, pattern=".*") {
+  
+  for (file in list.files(input.dir, pattern = pattern)) {
     
-    all.dataset.entries <- loadCacheTrainingRaw(root.dir) 
-      
-  } else {
+    tic()
     
-    for (file in list.files(input.dir, pattern = pattern)) {
-      dataset.entries <- read.csv(paste(input.dir,file,sep="/"),header=FALSE,sep="|",stringsAsFactors = FALSE,
-                                  colClasses=c("character","character","character","character","character","double","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric")
-      )
-      
-      if (exists('all.dataset.entries')) {
-        all.dataset.entries <- dplyr::union(all.dataset.entries,dataset.entries)
-      } else {
-        all.dataset.entries <- dataset.entries
-      }
-      break
+    print(paste("Cargando archivo [",file,"]"))
+    
+    dataset.entries <- read.csv(paste(input.dir,file,sep="/"),header=FALSE,sep="|",stringsAsFactors = FALSE,
+                                colClasses=c("character","character","character","character","character","double","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric")
+    )
+    
+    if (exists('all.dataset.entries')) {
+      all.dataset.entries <- dplyr::union(all.dataset.entries,dataset.entries)
+    } else {
+      all.dataset.entries <- dataset.entries
     }
     
-    names(all.dataset.entries) <- c("dt.year","dt.mode","dt.week","dt.day","dt.type","timestamp","eth.size","eth.dstHi","eth.dstLow","eth.srcHi","eth.srcLow","eth.type","ip.ihl","ip.tos","ip.length","ip.id","ip.offset","ip.ttl","ip.proto","ip.chksum","ip.src","ip.dst","icmp.type","icmp.code","icmp.chksum","tcp.sport","tcp.dport","tcp.seqNo","tcp.ackNo","tcp.dataOffset","tcp.flags","tcp.window","tcp.chksum","tcp.urgPtr","tcp.options","udp.sport","udp.dport","udp.length","udp.chksum") 
+    rnorm(1000,0,1)
+    toc()
+    
     
   }
   
+  names(all.dataset.entries) <- c("dt.year","dt.mode","dt.week","dt.day","dt.type","timestamp","eth.size","eth.dstHi","eth.dstLow","eth.srcHi","eth.srcLow","eth.type","ip.ihl","ip.tos","ip.length","ip.id","ip.offset","ip.ttl","ip.proto","ip.chksum","ip.src","ip.dst","icmp.type","icmp.code","icmp.chksum","tcp.sport","tcp.dport","tcp.seqNo","tcp.ackNo","tcp.dataOffset","tcp.flags","tcp.window","tcp.chksum","tcp.urgPtr","tcp.options","udp.sport","udp.dport","udp.length","udp.chksum") 
   
   return(all.dataset.entries)
   
@@ -176,10 +226,10 @@ loadDataset <- function(input.dir, pattern=".*", cache = FALSE, root.dir=getwd()
 #' @deprecated This is the first version based on test using tshark to extract informacion from tcdump files. Use "loadDataset" function instead
 loadDatasetV0 <- function(input.dir) {
   
-    for (file in list.files(input.dir)) {
-
+  for (file in list.files(input.dir)) {
+    
     dataset.entries <- read.csv(paste(input.dir,file,sep="/"),header=FALSE,sep=",",stringsAsFactors = FALSE)
-
+    
     if (exists('all.dataset.entries')) {
       all.dataset.entries <- dplyr::union(all.dataset.entries,dataset.entries)
     } else {
@@ -191,5 +241,5 @@ loadDatasetV0 <- function(input.dir) {
   names(all.dataset.entries) <- c("dt.year","dt.mode","dt.week","dt.day","dt.type","ip.proto","eth.dst","eth.type","eth.len","eth.src","icmp.checksum","icmp.code","icmp.type","ip.checksum","ip.dst","ip.fragment","ip.frag_offset","ip.hdr_len","ip.len","ip.src","ip.tos","ip.ttl","tcp.ack","tcp.checksum","tcp.dstport","tcp.flags","tcp.hdr_len","tcp.options","tcp.seq","tcp.srcport","tcp.urgent_pointer","tcp.window_size","udp.checksum","udp.dstport","udp.length","udp.srcport") 
   
   return(all.dataset.entries)
-
+  
 }

@@ -1,10 +1,55 @@
 library("tidyr")
 
+getCacheDir <- function(root.dir = getwd()) {
+  return( paste(root.dir,"cache",sep="/"))
+}
+
+getWorkerRepartition <- function() {
+  
+  wof<- rep(0,33)
+  wof[1]<-2
+  wof[2]<-4
+  wof[3]<-3
+  wof[4]<-0
+  wof[5]<-1
+  wof[6]<-5
+  wof[7]<-5
+  wof[8]<-0
+  wof[9]<-3
+  wof[10]<-5
+  wof[11]<-5
+  wof[12]<-0
+  wof[13]<-1
+  wof[14]<-4
+  wof[15]<-2
+  wof[16]<-1
+  wof[17]<-1
+  wof[18]<-1
+  wof[19]<-5
+  wof[20]<-3
+  wof[21]<-1
+  wof[22]<-4
+  wof[23]<-1
+  wof[24]<-3
+  wof[25]<-1
+  wof[26]<-5
+  wof[27]<-4
+  wof[28]<-0
+  wof[29]<-0
+  wof[30]<-0
+  wof[31]<-5
+  wof[32]<-0
+  wof[33]<-0
+  
+  return(wof)
+  
+}
+
+
 loadCacheModel <- function(root.dir= getwd()) {
   
-  input.dir <- paste(root.dir,'cache',sep='/')
   file.name <- 'model.ds.cache.RData'
-  file.fullname <- paste( input.dir,file.name,sep="/")
+  file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
   
   if(file.exists(file.fullname)) {
     load(file = file.fullname)
@@ -18,9 +63,8 @@ loadCacheModel <- function(root.dir= getwd()) {
 
 loadCacheTrainingCluster <- function(root.dir= getwd()) {
   
-  input.dir <- paste(root.dir,'cache',sep='/')
   file.name <- 'trainig.cluster.ds.cache.RData'
-  file.fullname <- paste( input.dir,file.name,sep="/")
+  file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
   
   if(file.exists(file.fullname)) {
     load(file = file.fullname)
@@ -34,9 +78,8 @@ loadCacheTrainingCluster <- function(root.dir= getwd()) {
 
 loadCacheTrainingRaw <- function(root.dir=getwd()) {
   
-  input.dir <- paste(root.dir,'cache',sep='/')
   file.name <- 'training.raw.ds.cache.RData'
-  file.fullname <- paste( input.dir,file.name,sep="/")
+  file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
   
   if(file.exists(file.fullname)) {
     load(file = file.fullname)
@@ -50,9 +93,8 @@ loadCacheTrainingRaw <- function(root.dir=getwd()) {
 
 loadCacheTestingRaw <- function(root.dir=getwd()) {
   
-  input.dir <- paste(root.dir,'cache',sep='/')
   file.name <- 'testing.raw.ds.cache.RData'
-  file.fullname <- paste( input.dir,file.name,sep="/")
+  file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
   
   if(file.exists(file.fullname)) {
     load(file = file.fullname)
@@ -66,9 +108,8 @@ loadCacheTestingRaw <- function(root.dir=getwd()) {
 
 loadCacheLabelAttackListRaw <- function(root.dir=getwd()) {
   
-  input.dir <- paste(root.dir,'cache',sep='/')
   file.name <- 'label.attacklist.raw.ds.cache.RData'
-  file.fullname <- paste( input.dir,file.name,sep="/")
+  file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
   
   if(file.exists(file.fullname)) {
     load(file = file.fullname)
@@ -79,4 +120,34 @@ loadCacheLabelAttackListRaw <- function(root.dir=getwd()) {
   return(label.attacklist.raw.ds.cache)
   
 }
+
+
+loadCacheScoringFeature <- function(nFeature, root.dir= getwd()) {
+  
+  file.name <- paste('scoring.feature',nFeature,'.ds.cache.RData', sep = "")
+  file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
+  
+  if(file.exists(file.fullname)) {
+    return(readRDS(file = file.fullname))
+    load(file = file.fullname)
+  } else {
+    return(NULL);
+  }
+  
+}
+
+saveCacheScoringFeature <- function(object, nFeature, root.dir= getwd()) {
+  
+  file.name <- paste('scoring.feature',nFeature,'.ds.cache.RData', sep = "")
+  file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
+  
+  saveRDS(object,file = file.fullname)
+  
+}
+
+
+saveCache <- function(object, filename, root.dir=getwd()) {
+  save(object, file =  paste( getCacheDir(root.dir), filename ,sep="/") )
+}
+
 
