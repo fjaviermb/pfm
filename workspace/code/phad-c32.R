@@ -10,8 +10,21 @@ source(paste(root.dir,"util/clusterer.R",sep="/"))
 
 #' @param cache     Do not do any calculation, use precalculated data
 #' @param root.dir  Workspace root directory used to load cached data
-train <- function(dataset, cache = FALSE, root.dir=getwd()) {
+#' @param wof       Indicates which feature is going to calculate
+train <- function(dataset, cache = FALSE, root.dir=getwd(), wof=NULL) {
   
+  # Just for distributed execution
+  worker.current <- 0
+  # Split task taking into account the workers
+  if( ! is.na(Sys.getenv()["worker_all"]) & !  is.na(Sys.getenv()["worker_current"])) {
+    worker.all <- as.numeric(Sys.getenv("worker_all"))
+    worker.current <- as.numeric(Sys.getenv("worker_current"))  
+  }
+  
+  if( is.null(wof) ) {
+    wof<- rep(worker.current,33) 
+  }
+    
   model = list()
   
   if( cache ) {
@@ -26,28 +39,66 @@ train <- function(dataset, cache = FALSE, root.dir=getwd()) {
     posfeature <- offsetFeatures
     
     for (feature in features) { 
-      
+    
       tic()
-      print( paste("[",posfeature - offsetFeatures, "/",ncol(dataset)-offsetFeatures,"] Processing feature: [",feature,"]") )
-      model[[feature]] <- Clusterer$new() 
       
-      tmpCluster <- model[[feature]]
+      nFeature = posfeature - offsetFeatures + 1;
       
-      for(index in 1:nrow(dataset)){
-        value <- dataset[index,posfeature]
-        if( !  is.na(value) ) {
-          tmpCluster$add(value)
-        }
+      print( paste("[",nFeature, "/",ncol(dataset)-offsetFeatures+1,"] Processing feature: [",feature,"]") )
+      
+      featureObs <- dataset[,posfeature]
+    
+      # Calculate only for this worker
+      
+      if(wof[nFeature] == worker.current ) {
+      
+        model[[feature]] <- trainFeature (featureObs, nFeature, cache, root.dir)
+        
+        rnorm(1000,0,1)
+      
+        toc()
+      
+      } else {
+      
+        # Init with empty information
+        model[[feature]] <- Clusterer$new()
         
       }
-      
-      rnorm(1000,0,1)
-      toc()
       
       posfeature <- posfeature + 1
       
     }
   } 
+  
+  return(model)
+  
+}
+      
+    
+#' Specific feature training
+#' @param featureObs  Observations for current feature (vector)
+#' @param nFeature    Feature position in order to save or load from cache 
+#' @param cache       Do not do any calculation, use precalculated data
+#' @param root.dir    Workspace root directory used to load cached data
+trainFeature <-  function(featureObs, nFeature, cache = FALSE, root.dir = getwd()) {
+  
+  if (cache) {
+    model = loadCacheModelFeature(nFeature, root.dir)
+  } else {
+    model = Clusterer$new()
+    
+    for (index in 1:length(featureObs)) {
+      featureObservation <- featureObs[index]
+      if (!is.na(featureObservation)) {
+        model$add(featureObservation)
+      }
+      
+    }
+    
+    # Save calculated model
+    saveCacheModelFeature(model, nFeature, root.dir);
+    
+  }
   
   return(model)
   
