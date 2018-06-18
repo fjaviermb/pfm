@@ -27,11 +27,15 @@ train <- function(dataset, cache = FALSE, root.dir=getwd(), wof=NULL) {
     
   model = list()
   
+  
+  # If cache is enabled, try to load. If it is not available, continue with cache for the objects/parts of the model
   if( cache ) {
     
     model = loadCacheModel(root.dir)
     
-  } else {
+  } 
+  
+  if( ! cache || is.null(model) ) {
     
     offsetFeatures = 7
     
@@ -83,7 +87,9 @@ train <- function(dataset, cache = FALSE, root.dir=getwd(), wof=NULL) {
 trainFeature <-  function(featureObs, nFeature, cache = FALSE, root.dir = getwd()) {
   
   if (cache) {
+    
     model = loadCacheModelFeature(nFeature, root.dir)
+    
   } else {
     model = Clusterer$new()
     
