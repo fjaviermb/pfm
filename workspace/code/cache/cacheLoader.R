@@ -144,6 +144,22 @@ saveCacheModelFeature <- function(object, nFeature, root.dir= getwd()) {
   saveRDS(object,file = file.fullname)
   
 }
+
+loadCacheModelFeature <- function(nFeature, root.dir= getwd()) {
+  
+  file.name <- paste('model.feature',nFeature,'.ds.cache.RData', sep = "")
+  file.fullname <- paste( getCacheDir(root.dir),'partial',file.name,sep="/")
+  
+  if(file.exists(file.fullname)) {
+    return(readRDS(file = file.fullname))
+    load(file = file.fullname)
+  } else {
+    return(NULL);
+  }
+  
+}
+
+
 saveCacheScoringFeature <- function(object, nFeature, root.dir= getwd()) {
   
   file.name <- paste('scoring.feature',nFeature,'.ds.cache.RData', sep = "")
@@ -159,3 +175,13 @@ saveCache <- function(object, filename, root.dir=getwd()) {
 }
 
 
+saveCacheTraniningDataset <- function(root.dir= getwd()) {
+  
+  file.name <- 'training.raw.ds.cache.RData'
+  file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
+  
+  training.raw.ds.cache <- training.raw.ds
+  
+  save(training.raw.ds.cache,file = file.fullname )
+  
+}
