@@ -44,6 +44,7 @@ loadTrainingDataset <- function(cache = FALSE, root.dir=getwd()) {
 }
 
 #' Load testing dataset
+#' Load testing dataset
 loadTestingDataset <- function(cache = FALSE, root.dir = getwd() ) {
   
   if( cache ) {
@@ -52,8 +53,25 @@ loadTestingDataset <- function(cache = FALSE, root.dir = getwd() ) {
     
   } else {
     
-    testing.raw.ds.tmp <- loadDataset(getRawDir(root.dir), PATTERN_TESTING)
+    filelist = c(
+      '1999_testing_week4_monday_inside.csv',
+      '1999_testing_week4_wednesday_inside.csv',
+      '1999_testing_week4_thursday_inside.csv',
+      '1999_testing_week4_friday_inside.csv',
+      '1999_testing_week5_monday_inside.csv',
+      '1999_testing_week5_tuesday_inside.csv',
+      '1999_testing_week5_wednesday_inside.csv',
+      '1999_testing_week5_thursday_inside.csv',
+      '1999_testing_week5_friday_inside.csv'
+      
+    )
+    
+    testing.raw.ds.tmp  <- loadDataset(getRawDir(root.dir), pattern =  NULL, filelist = filelist)
+    
+    
+    #testing.raw.ds.tmp <- loadDataset(getRawDir(root.dir), PATTERN_TESTING)
     testing.raw.ds <- testing.raw.ds.tmp %>% arrange(timestamp)
+    
     
   }
   
