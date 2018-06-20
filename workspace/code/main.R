@@ -66,6 +66,24 @@ label.attacklist.raw.ds <- loadLabelAttackList(cache = TRUE, root.dir)
 training.raw.ds <- loadTrainingDataset(cache = TRUE, root.dir)
 
 
+# Create an array to calculate specific features of the model
+# Set don't do any feature calculation. It is possible to initialitze wof to null (wof <-NULL)
+wof <- rep(-1,33)
+
+# Get current worker
+worker.current <- 0
+
+if( ! is.na(Sys.getenv()["worker_all"]) & !  is.na(Sys.getenv()["worker_current"])) {
+  worker.all <- as.numeric(Sys.getenv("worker_all"))
+  worker.current <- as.numeric(Sys.getenv("worker_current"))  
+}
+
+# Select which features are going to claculate by this worker
+# i.e.: wof[31] <- worker.current
+
+# Calculate the model
+model.ds <- train(training.raw.ds, cache = FALSE, root.dir,wof)
+
 # Load tranining data
 #testing.raw.ds <- loadTestingDataset(cache = TRUE, root.dir )
 
