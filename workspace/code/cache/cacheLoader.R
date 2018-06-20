@@ -125,6 +125,7 @@ loadCacheLabelAttackListRaw <- function(root.dir=getwd()) {
 loadCacheScoringFeature <- function(nFeature, root.dir= getwd()) {
   
   file.name <- paste('scoring.feature',nFeature,'.ds.cache.RData', sep = "")
+  file.fullname <- paste( getCacheDir(root.dir),'partial',file.name,sep="/")
   
   if(file.exists(file.fullname)) {
     return(readRDS(file = file.fullname))
@@ -138,7 +139,7 @@ loadCacheScoringFeature <- function(nFeature, root.dir= getwd()) {
 saveCacheModelFeature <- function(object, nFeature, root.dir= getwd()) {
   
   file.name <- paste('model.feature',nFeature,'.ds.cache.RData', sep = "")
-  file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
+  file.fullname <- paste( getCacheDir(root.dir),'partial',file.name,sep="/")
   
   saveRDS(object,file = file.fullname)
   
