@@ -78,47 +78,32 @@ train <- function(dataset, cache = FALSE, root.dir=getwd(), wof=NULL) {
   
 }
 
-#' Specific feature training
+#' Do training for a specific feature or variable
+#' 
 #' @param featureObs  Observations for current feature (vector)
 #' @param nFeature    Feature position in order to save or load from cache 
 #' @param cache       Do not do any calculation, use precalculated data
 #' @param root.dir    Workspace root directory used to load cached data
 trainFeature <-  function(featureObs, nFeature, cache = FALSE, root.dir = getwd()) {
   
-  
-  
   if (cache) {
+
     model = loadCacheModelFeature(nFeature, root.dir)
+  
   } else {
     
-    
     model = Clusterer$new()
-    
-    # Init log for the cluster state
-    logCluster <- c()
-    indexCluster <- 1
-    
-    for (index in 1:length(featureObs)) {
-      featureObservation <- featureObs[index]
+
+    for (featureObservation in featureObs) {
+
       if (!is.na(featureObservation)) {
+
         model$add(featureObservation)
-        
-        # Log state of cluster
-        logCluster[indexCluster] <- paste(model$getDistinct(),"/",model$getTotal(),"|",featureObservation,sep="")
-        indexCluster <- indexCluster+1;
-        
+
       }
       
     }
-    
-    # write log
-    logClusterDF <- data.frame(logCluster)
-    
-    write.table(logClusterDF,'/mnt/shared/spfm/r.out',quote=FALSE,row.names=FALSE, col.names = F)
-    rm(logClusterDF)
-    rm(logCluster)
-    gc()
-    
+
     # Save calculated model
     saveCacheModelFeature(model, nFeature, root.dir);
     
@@ -508,14 +493,13 @@ trainv0 <- function(dataset, cache = FALSE, root.dir=getwd()) {
   
 }
 
-# ' From 143
-# 'This functions is only for results validation. Create a dataframe with the following information from model
+# ' Cluster/model results dump. Create a dataframe with the following information from model
 # ' Fieldname: feature
 # ' r/n: text containrin r value + character "/" + n Value
 # ' r: value of r
 # ' n: value of n
 # ' Values: first two values
-#' @param model.ds             Model used to decide whether a register is an attack or not 
+#' @param model.ds   Model used to decide whether a register is an attack or not 
 getModelDataframe <- function(model.ds) 
 {
   
@@ -524,11 +508,8 @@ getModelDataframe <- function(model.ds)
   nrow <-  length(model.ds)
   ncol <- length(featureNames)
   
-  
   training.tabular.model.ds <- data.frame(matrix(rep(0,nrow,ncol),nrow=nrow,ncol=ncol))
   trainingFeatureNames <- names(model.ds)
-  
-  
   
   for(nFeature in 1:nrow) {
     
@@ -550,7 +531,6 @@ getModelDataframe <- function(model.ds)
   names(training.tabular.model.ds) <- featureNames;
   
   return(training.tabular.model.ds)
-  
   
 }
 
