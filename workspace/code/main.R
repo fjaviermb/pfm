@@ -65,8 +65,6 @@ label.attacklist.raw.ds <- loadLabelAttackList(cache = TRUE, root.dir)
 # Load tranining data
 training.raw.ds <- loadTrainingDataset(cache = TRUE, root.dir)
 
-# Calculate model
-model.ds <- train(training.raw.ds, cache = FALSE, root.dir)
 
 # Load tranining data
 #testing.raw.ds <- loadTestingDataset(cache = TRUE, root.dir )
