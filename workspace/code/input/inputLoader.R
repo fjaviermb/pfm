@@ -24,7 +24,18 @@ loadTrainingDataset <- function(cache = FALSE, root.dir=getwd()) {
     
   } else {
     
-    training.raw.ds <- loadDataset(getRawDir(root.dir), PATTERN_TRAINING)
+    filelist = c(
+      '1999_training_week3_monday_inside.csv',
+      '1999_training_week3_extra_monday_inside.csv',
+      '1999_training_week3_tuesday_inside.csv',
+      '1999_training_week3_extra_tuesday_inside.csv',
+      '1999_training_week3_wednesday_inside.csv',
+      '1999_training_week3_extra_wednesday_inside.csv',
+      '1999_training_week3_thursday_inside.csv',
+      '1999_training_week3_friday_inside.csv'
+      )
+      
+    training.raw.ds <- loadDataset(getRawDir(root.dir), pattern =  NULL, filelist = filelist)
     
   }
   
@@ -144,21 +155,26 @@ loadLabelAttackList <- function(cache = FALSE, root.dir=getwd()) {
 #' @example: loadDataset input/file...
 #' @param input.dir Path containing dataset input files
 #' @param root.dir  Workspace root directory used to load cached data
-#' @param pattern   Filer fiels in raw directory. Default: all files pattern (.*)
-loadDataset <- function(input.dir, pattern=".*") {
+#' @param filelist  Specific file list. If it is NULL, pattern option is used 
+#' @param pattern   Filer fiels in raw directory. IfDefault: all files pattern (.*)
+loadDataset <- function(input.dir, pattern = NULL, filelist = NULL) {
   
-  for (file in list.files(input.dir, pattern = pattern)) {
+  if( is.null(filelist ) ) {
+    filelist = list.files(input.dir, pattern = pattern)
+  }
+
+  for (file in filelist ) {  
+  
+      tic()
     
-    tic()
-    
-    print(paste("Cargando archivo [",file,"]"))
-    
-    dataset.entries <- read.csv(paste(input.dir,file,sep="/"),header=FALSE,sep="|",stringsAsFactors = FALSE,
+      print(paste("Cargando archivo [",file,"]"))
+  
+      dataset.entries <- read.csv(paste(input.dir,file,sep="/"),header=FALSE,sep="|",stringsAsFactors = FALSE,
                                 colClasses=c("character","character","character","character","character","double","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric")
     )
-    
+     
     if (exists('all.dataset.entries')) {
-      all.dataset.entries <- dplyr::union(all.dataset.entries,dataset.entries)
+      all.dataset.entries <- dplyr::bind_rows(all.dataset.entries,dataset.entries)
     } else {
       all.dataset.entries <- dataset.entries
     }
@@ -233,8 +249,9 @@ loadDatasetV0 <- function(input.dir) {
     dataset.entries <- read.csv(paste(input.dir,file,sep="/"),header=FALSE,sep=",",stringsAsFactors = FALSE)
     
     if (exists('all.dataset.entries')) {
-      all.dataset.entries <- dplyr::union(all.dataset.entries,dataset.entries)
-    } else {
+      # all.dataset.entries <- dplyr::union(all.dataset.entries,dataset.entries)
+      all.dataset.entries <- dplyr::bind_rows(all.dataset.entries,dataset.entries)
+     } else {
       all.dataset.entries <- dataset.entries
     }
     break
@@ -245,3 +262,29 @@ loadDatasetV0 <- function(input.dir) {
   return(all.dataset.entries)
   
 }
+
+
+## EXTRA: Load index
+loadIndex <- function() {
+  
+  file <- '/home/nuctools/workspace/gitrepos/repos/ml-ids/index_ts_neto.txt'
+  index.ds <- read.csv(file,header=FALSE,sep=",",stringsAsFactors = FALSE,colClasses=c("double"))
+  names(index.ds) <- c('timestamp')
+  return(index.ds)
+}
+
+sortTraining <- function(index.ds, training.raw.ds) {
+  
+  require(gdata)
+  index <- as.vector(index.ds['timestamp'])
+  
+  #training.raw.ds[match(index, training.raw.ds$timestamp,]
+  
+  training.raw.ds$timestamp <- reorder.factor(training.raw.ds$timestamp, new.order=index)
+  require(dplyr)
+  training.raw.ds.sorted <- training.raw.ds %>% arrange(timestamp)
+  
+  
+  
+}
+
