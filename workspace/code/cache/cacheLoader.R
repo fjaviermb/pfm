@@ -184,3 +184,15 @@ saveCacheTraniningDataset <- function(root.dir= getwd()) {
   save(training.raw.ds.cache,file = file.fullname )
   
 }
+
+
+saveCacheTestingDataset <- function(root.dir= getwd()) {
+  
+  file.name <- 'testing.raw.ds.cache.RData'
+  file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
+  
+  testing.raw.ds.cache <- testing.raw.ds
+  
+  save(testing.raw.ds.cache,file = file.fullname )
+  
+}
