@@ -213,3 +213,28 @@ saveCacheModel <- function(root.dir= getwd()) {
   
 }
 
+
+saveCacheLabelAttackListRaw <- function(root.dir=getwd()) {
+  
+  file.name <- 'label.attacklist.raw.ds.cache.RData'
+  file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
+  
+  label.attacklist.raw.ds.cache <- label.attacklist.raw.ds
+  
+  save(label.attacklist.raw.ds.cache,file = file.fullname )
+  
+}
+
+saveCacheLabelTestingRaw <- function(root.dir=getwd()) {
+  
+  file.name <- 'label.testing.raw.ds.cache.RData'
+  file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
+  
+  label.testing.raw.ds.cache <- label.testing.raw.ds
+  
+  save(abel.testing.raw.ds.cache,file = file.fullname )
+  
+}
+
+label.testing.raw.ds 
+
