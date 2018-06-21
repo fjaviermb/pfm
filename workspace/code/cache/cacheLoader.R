@@ -127,6 +127,24 @@ loadCacheLabelAttackListRaw <- function(root.dir=getwd()) {
 }
 
 
+
+loadCacheLabelTestingRaw <- function(root.dir=getwd()) {
+  
+  file.name <- 'label.testing.raw.ds.cache.RData'
+  file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
+  
+  if(file.exists(file.fullname)) {
+    load(file = file.fullname)
+  } else {
+    return(NULL);
+  }
+  
+  return(label.testing.raw.ds.cache)
+  
+}
+
+
+
 loadCacheScoringFeature <- function(nFeature, root.dir= getwd()) {
   
   file.name <- paste('scoring.feature',nFeature,'.ds.cache.RData', sep = "")
@@ -232,7 +250,7 @@ saveCacheLabelTestingRaw <- function(root.dir=getwd()) {
   
   label.testing.raw.ds.cache <- label.testing.raw.ds
   
-  save(abel.testing.raw.ds.cache,file = file.fullname )
+  save(label.testing.raw.ds.cache,file = file.fullname )
   
 }
 
