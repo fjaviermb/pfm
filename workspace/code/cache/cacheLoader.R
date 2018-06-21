@@ -4,6 +4,11 @@ getCacheDir <- function(root.dir = getwd()) {
   return( paste(root.dir,"cache",sep="/"))
 }
 
+#' Maybe deprecated
+#' Usage:  
+## Only for a distrbuted execution 
+# Take information about distributed execution
+#wof <- getWorkerRepartition()
 getWorkerRepartition <- function() {
   
   wof<- rep(0,33)
@@ -196,3 +201,15 @@ saveCacheTestingDataset <- function(root.dir= getwd()) {
   save(testing.raw.ds.cache,file = file.fullname )
   
 }
+
+saveCacheModel <- function(root.dir= getwd()) {
+  
+  file.name <- 'model.ds.cache.RData'
+  file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
+  
+  model.ds.cache <- model.ds
+  
+  save(model.ds.cache,file = file.fullname )
+  
+}
+
