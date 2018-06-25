@@ -159,6 +159,23 @@ loadCacheScoringFeature <- function(nFeature, root.dir= getwd()) {
   
 }
 
+loadCacheTestingDatasetScored <- function(root.dir= getwd()) {
+  
+  
+  file.name <- 'testing.raw.scored.ds.cache.RData'
+  file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
+  
+  if(file.exists(file.fullname)) {
+    load(file = file.fullname)
+  } else {
+    return(NULL);
+  }
+  
+  return(testing.raw.scored.ds.cache)
+  
+}
+
+
 saveCacheModelFeature <- function(object, nFeature, root.dir= getwd()) {
   
   file.name <- paste('model.feature',nFeature,'.ds.cache.RData', sep = "")
@@ -217,6 +234,17 @@ saveCacheTestingDataset <- function(root.dir= getwd()) {
   testing.raw.ds.cache <- testing.raw.ds
   
   save(testing.raw.ds.cache,file = file.fullname )
+  
+}
+
+saveCacheTestingDatasetScored <- function(root.dir= getwd()) {
+  
+  file.name <- 'testing.raw.scored.ds.cache.RData'
+  file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
+  
+  testing.raw.scored.ds.cache <- testing.raw.scored.ds
+  
+  save(testing.raw.scored.ds.cache,file = file.fullname )
   
 }
 
