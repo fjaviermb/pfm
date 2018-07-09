@@ -37,7 +37,7 @@ packages<-function(x){
 # install.packages("hash")
 library("dplyr")
 library("tidyr")
-
+library("ggplot2")
 
 
 # Clear environment
@@ -59,36 +59,70 @@ source(paste(root.dir,"input/inputLoader.R",sep="/"))
 source(paste(root.dir,"util/clusterer.R",sep="/"))
 source(paste(root.dir,"phad-c32.R",sep="/"))
 
-# Load master attack list
-label.attacklist.raw.ds <- loadLabelAttackList(cache = TRUE, root.dir)
-
-# Load tranining data
-training.raw.ds <- loadTrainingDataset(cache = TRUE, root.dir)
 
 
-# Create an array to calculate specific features of the model
-# Set don't do any feature calculation. It is possible to initialitze wof to null (wof <-NULL)
-wof <- rep(-1,33)
-
-# Get current worker
-worker.current <- 0
-
-if( ! is.na(Sys.getenv()["worker_all"]) & !  is.na(Sys.getenv()["worker_current"])) {
-  worker.all <- as.numeric(Sys.getenv("worker_all"))
-  worker.current <- as.numeric(Sys.getenv("worker_current"))  
+getWorker <- function() {
+  
+  # Get current worker. By default no worker or invalid worker
+  worker.current <- -1
+  
+  if( ! is.na(Sys.getenv()["worker_all"]) & !  is.na(Sys.getenv()["worker_current"])) {
+    worker.all <- as.numeric(Sys.getenv("worker_all"))
+    worker.current <- as.numeric(Sys.getenv("worker_current"))  
+  }
+  
+  return (worker.current)
+  
 }
 
+
+calculateModel <- function(root.dir = getwd(), cache = TRUE, wof ) {
+  
+  # if cache is enabled, try to load fisrt the model, if not, continue normal flow
+  if( cache ) {
+    model.ds = loadCacheModel(root.dir)
+  }
+  
+  if( is.null (model.ds) ) {
+    
+    # Load tranining data
+    training.raw.ds <- loadTrainingDataset(cache, root.dir)
+    
+    # Calculate the model
+    model.ds <- train(training.raw.ds, cache, root.dir,wof)
+    
+    # Release resources  
+    rm(training.raw.ds)
+    gc()
+    
+  }
+  
+  return(model.ds)  
+  
+}
+
+worker.current <- getWorker()
+
+logger("Starting process..")
+model.ds <- calculateModel(root.dir, cache = TRUE, wof = NULL)
+logger("Model calculated")
+# Load master attack list
+label.attacklist.raw.ds <- loadLabelAttackList(cache = FALSE, root.dir)
+logger("Label attack list loaded")
+# Load tranining data
+testing.raw.ds <- loadTestingDataset(cache = TRUE, root.dir )
+logger("Testing data loaded")
+# Load label data
+label.testing.raw.ds <- labelTestingDS(testing.raw.ds, label.attacklist.raw.ds, TRUE, root.dir)
+logger("Label data loaded")
+
+# Load scoring features
 # Select which features are going to claculate by this worker
 # i.e.: wof[31] <- worker.current
-
-# Calculate the model
-model.ds <- train(training.raw.ds, cache = FALSE, root.dir,wof)
-
-# Load tranining data
-#testing.raw.ds <- loadTestingDataset(cache = TRUE, root.dir )
-
-# label.testing.raw.ds <- labelTestingDS(testing.raw.ds, label.attacklist.raw.ds)
+wof <- rep(-1,33)
+#wof[1]<-worker.current
+wof[20]<-worker.current
 
 #testing.raw.ds %>% filter( timestamp >= 922677515) %>% filter( timestamp <= 922677762)
-#scoresAll <- scoring(model.ds,testing.raw.ds, label.testing.raw.ds, FALSE, root.dir)
+scoresAll <- scoring(model.ds,testing.raw.ds, label.testing.raw.ds, FALSE, root.dir, wof)
 #scoresAll <- scoringAggregate(model.ds,testing.raw.ds, label.testing.raw.ds, TRUE, root.dir)

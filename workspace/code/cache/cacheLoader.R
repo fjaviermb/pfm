@@ -126,6 +126,21 @@ loadCacheLabelAttackListRaw <- function(root.dir=getwd()) {
   
 }
 
+loadCacheLabelAttackTypesRaw <- function(root.dir=getwd()) {
+  
+  file.name <- 'label.attacktypes.raw.ds.cache.RData'
+  file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
+  
+  if(file.exists(file.fullname)) {
+    load(file = file.fullname)
+  } else {
+    return(NULL);
+  }
+  
+  return(label.attacktypes.raw.ds.cache)
+  
+}
+
 
 
 loadCacheLabelTestingRaw <- function(root.dir=getwd()) {
@@ -259,6 +274,17 @@ saveCacheModel <- function(root.dir= getwd()) {
   
 }
 
+
+saveCacheLabelAttackTypeRaw <- function(root.dir=getwd()) {
+  
+  file.name <- 'label.attacktypes.raw.ds.cache.RData'
+  file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
+  
+  label.attacktypes.raw.ds.cache <- label.attacktypes.raw.ds
+  
+  save(label.attacktypes.raw.ds.cache,file = file.fullname )
+  
+}
 
 saveCacheLabelAttackListRaw <- function(root.dir=getwd()) {
   

@@ -6,6 +6,7 @@ PATTERN_TRAINING <- ".*training.*"
 PATTERN_TESTING <- ".*testing.*"
 #PATTERN_TESTING <- "1999_testing_week4_monday_inside.csv"
 PATTERN_ATTACK_LIST <- "master-listfile-condensed.csv"
+PATTERN_ATTACK_TYPE_LIST <- "master-attack-types.csv"
 INPUT_RAW_DIR <- "raw"
 
 
@@ -280,6 +281,48 @@ loadDatasetV0 <- function(input.dir) {
   return(all.dataset.entries)
   
 }
+
+#' Load relation between their name and their type or category
+#' 
+#' @description Load relation between their name and their type or category. It is only one file, a CSV file with "|" separator. The file format is:
+#'
+#'   Column01: name		        Name of the attack
+#'   Column02: type   	      Category of the attack
+#'
+#' @param cache     Do not do any calculation, use precalculated data
+#' @param root.dir  Workspace root directory used to load cached data
+loadLabelAttackTypes <- function(cache = FALSE, root.dir=getwd()) {
+  
+  if( cache ) {
+    
+    label.attacktypes.raw.ds <- loadCacheLabelAttackTypesRaw(root.dir) 
+    
+  } else {
+    
+    #  Path containing dataset input files
+    input.dir <- getRawDir(root.dir)
+    
+    for (file in list.files(input.dir, pattern = PATTERN_ATTACK_TYPE_LIST)) {
+      
+      label.attacktypes.raw.ds <- read.csv(paste(input.dir,file,sep="/"),header=FALSE,sep="|",stringsAsFactors = FALSE,
+                                          colClasses=c("character", "character")
+      )
+      
+    }
+    
+    if( ! exists("label.attacktypes.raw.ds") ) {
+      print(paste("WARNING: No label attack type files found, creating an empty vector (input directory[",input.dir,"]"))
+      label.attacklist.raw.ds <- c("0","0")
+    }
+    
+    names(label.attacktypes.raw.ds) <- c("name","type");
+    
+  }  
+  
+  return(label.attacktypes.raw.ds)
+  
+}
+
 
 
 ## EXTRA: Load index

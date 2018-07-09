@@ -113,6 +113,67 @@ trainFeature <-  function(featureObs, nFeature, cache = FALSE, root.dir = getwd(
   
 }
 
+# ' Creates initial labeled attack dataset. It says for if an testing entry is really or not an attack. Doesn't includes
+# ' attack name or attack id
+#' @param cache       Do not do any calculation, use precalculated data
+#' @param root.dir    Workspace root directory used to load cached data
+labelEmptyTestingDS <- function(testing.raw.ds, label.attacklist.raw.ds, cache = FALSE, root.dir = getwd()) {
+  
+  if( cache ) {
+    
+    label.testing.raw.ds <- loadCacheLabelTestingRaw(root.dir)
+    
+  }
+  
+  if( !cache || is.null(label.testing.raw.ds)) {
+    
+    #label.testing.raw.ds <- testing.raw.ds %>% select(timestamp,ip.dst) %>% mutate( ts = trunc(timestamp / 1000000),  attack = FALSE)
+    label.testing.raw.ds <- testing.raw.ds %>% select(timestamp,ip.dst) %>% mutate( ts = timestamp,  attackid = NA, attack = FALSE, name = NA)
+    
+    tic()
+    nrows <- nrow(label.attacklist.raw.ds)
+    for(index in 1:nrows){
+      
+      
+      logger( paste("[",index, "/",nrows, "] Processing attack..." ))
+      
+      tsStart <-label.attacklist.raw.ds$starttime[index]
+      tsEnd <- label.attacklist.raw.ds$endtime[index]
+      ipDst <- label.attacklist.raw.ds$dstIP[index]
+      name <- label.attacklist.raw.ds$name[index]
+      
+      label.testing.raw.ds <- label.testing.raw.ds %>% 
+        mutate( attack = attack %>% replace( attack == FALSE & ts >= tsStart & ts <= tsEnd & ip.dst == ipDst, TRUE) )
+      
+    }
+    
+    
+    rnorm(1000,0,1)
+    toc()
+    
+  }
+  
+  nrows <- nrow( label.testing.raw.ds)
+  for(index in 1:nrows){
+    
+    logger( paste("[",index, "/",nrows,"] Getting name attack..." ))
+    
+    if( isTRUE(label.testing.raw.ds[['attack']][index])) {
+      
+      ts <- label.testing.raw.ds[['ts']][index] 
+      ipDst <- label.testing.raw.ds[['ip.dst']][index] 
+      
+      attackName <- first(label.attacklist.raw.ds %>% filter( starttime <= ts & endtime >= ts & dstIP == ipDst ) %>% select (name))
+      label.testing.raw.ds[['name']][index] <- attackName
+      
+    }
+    
+  }
+  
+  
+  return(label.testing.raw.ds)
+}
+
 # ' This funcitons creates a label map. It says for if an testing entry is really or not an attack
 #' @param cache       Do not do any calculation, use precalculated data
 #' @param root.dir    Workspace root directory used to load cached data
@@ -140,6 +201,7 @@ labelTestingDS <- function(testing.raw.ds, label.attacklist.raw.ds, cache = FALS
       tsEnd <- label.attacklist.raw.ds$endtime[index]
       ipDst <- label.attacklist.raw.ds$dstIP[index]
       name <- label.attacklist.raw.ds$name[index]
+      
       
       label.testing.raw.ds <- label.testing.raw.ds %>% 
         mutate( attack = attack %>% replace( attack == FALSE & ts >= tsStart & ts <= tsEnd & ip.dst == ipDst, TRUE) )
@@ -170,6 +232,64 @@ labelTestingDS <- function(testing.raw.ds, label.attacklist.raw.ds, cache = FALS
   
   return(label.testing.raw.ds)
   
+  
+}
+
+
+
+# ' Adds attack name information
+#' @param cache       Do not do any calculation, use precalculated data
+#' @param root.dir    Workspace root directory used to load cached data
+enrichAttackNameLabelTestingDS <- function(label.testing.raw.ds, label.attacklist.raw.ds) {
+  
+  nrows <- nrow( label.testing.raw.ds)
+  for(index in 1:nrows){
+    
+    logger( paste("[",index, "/",nrows,"] Getting name attack..." ))
+    
+    if( isTRUE(label.testing.raw.ds[['attack']][index])) {
+      
+      ts <- label.testing.raw.ds[['ts']][index] 
+      ipDst <- label.testing.raw.ds[['ip.dst']][index] 
+      
+      attackName <- first(label.attacklist.raw.ds %>% filter( starttime <= ts & endtime >= ts & dstIP == ipDst ) %>% select (name))
+      label.testing.raw.ds[['name']][index] <- attackName
+      
+    }
+    
+  }
+  
+  
+  return(label.testing.raw.ds)
+}
+
+
+# ' Adds attack id information
+enrichAttackIdLabelTestingDS <- function(label.testing.raw.ds, label.attacklist.raw.ds) {
+  
+  # Just for showing information for long operations
+  logrange <- 1000
+  
+  nrows <- nrow( label.testing.raw.ds)
+  for(index in 1:nrows){
+    
+    if( index %% logrange == 0) {
+      logger( paste("[",index, "/",nrows,"] Getting attack id..." ))
+    }
+    
+    if( isTRUE(label.testing.raw.ds[['attack']][index])) {
+      
+      ts <- label.testing.raw.ds[['ts']][index] 
+      ipDst <- label.testing.raw.ds[['ip.dst']][index] 
+      
+      attackid <- first(label.attacklist.raw.ds %>% filter( starttime <= ts & endtime >= ts & dstIP == ipDst ) %>% select (id))
+      label.testing.raw.ds[['attackid']][index] <- attackid
+      
+    }
+    
+  }
+  
+  return(label.testing.raw.ds)
   
 }
 
@@ -257,7 +377,7 @@ scoring <- function(model.ds,testing.raw.ds, label.testing.raw.ds, cache = TRUE,
     # Initialize score to NULL
     score <- NULL
     
-    logger(paste("Processing en scoreing ",indexFeature, " WOF[ ", wof[indexFeatureOnModel],"] Worker[",worker.current,"]"))
+    logger(paste("Processing en scoring ",indexFeature, " WOF[ ", wof[indexFeatureOnModel],"] Worker[",worker.current,"]"))
     
     
     if(wof[indexFeatureOnModel] == worker.current ) {
@@ -269,11 +389,11 @@ scoring <- function(model.ds,testing.raw.ds, label.testing.raw.ds, cache = TRUE,
       
       if( ! exists("score") || is.null(score)  ) {
         
-
+        
         score <- scoreFeature(model.ds,testing.raw.ds[indexFeatureOnTraining], 
                               indexFeatureOnModel, indexFeatureOnTraining, indexTimestampFeature,
                               lastAnomaly[1, indexFeatureOnModel], nr[indexFeatureOnModel], testing.raw.ds[indexTimestampFeature])
-
+        
         # Save score
         saveCacheScoringFeature(score, indexFeatureOnModel, root.dir)
       }
@@ -340,7 +460,7 @@ scoreFeature <- function(model.ds,testing.raw.ds, indexFeatureOnModel, indexFeat
     
     valueFeature <- testing.raw.ds[[1]][indexObs] #,indexFeatureOnTraining]
     
-       
+    
     # Check if current feature doesn't not apply to the model
     # The feature has not to be taken into an account if the value is NA
     if(! is.na(valueFeature ) ) { 
@@ -560,8 +680,9 @@ getModelDataframe <- function(model.ds)
 }
 
 
-getLabeledTesgingData <- function(testing.raw.ds, label.testing.raw.ds, cache = TRUE, root.dir) {
+getLabeledTestingData <- function(testing.raw.ds, label.testing.raw.ds, cache = TRUE, root.dir) {
   
+  testing.raw.ds <- bind_cols(testing.raw.ds, label.testing.raw.ds['attackid'])
   testing.raw.ds <- bind_cols(testing.raw.ds, label.testing.raw.ds['attack'])
   testing.raw.ds <- bind_cols(testing.raw.ds, label.testing.raw.ds['name'])
   
