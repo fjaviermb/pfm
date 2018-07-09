@@ -59,12 +59,9 @@ loadTestingDataset <- function(cache = FALSE, root.dir = getwd() ) {
     )
     
     testing.raw.ds.tmp  <- loadDataset(getRawDir(root.dir), pattern =  NULL, filelist = filelist)
-    
-    
-    #testing.raw.ds.tmp <- loadDataset(getRawDir(root.dir), PATTERN_TESTING)
+
     testing.raw.ds <- testing.raw.ds.tmp %>% arrange(timestamp)
-    
-    
+
   }
   
   return(testing.raw.ds)
@@ -97,12 +94,10 @@ loadLabelAttackList <- function(cache = FALSE, root.dir=getwd()) {
     input.dir <- getRawDir(root.dir)
    
     for (file in list.files(input.dir, pattern = PATTERN_ATTACK_LIST)) {
-      print(input.dir)
-      print(file)
+
       label.attacklist.raw.ds <- read.csv(paste(input.dir,file,sep="/"),header=FALSE,sep="|",stringsAsFactors = FALSE,
-                                          colClasses=c("character","double","double","double","character","character")
-      )
-      
+                                          colClasses=c("character","double","double","double","character","character"))
+
     }
     
     if( ! exists("label.attacklist.raw.ds") ) {
