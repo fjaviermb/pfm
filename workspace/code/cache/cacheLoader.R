@@ -1,5 +1,7 @@
 library("tidyr")
 
+source(paste(root.dir,"util/remote.R",sep="/"))
+
 getCacheDir <- function(root.dir = getwd()) {
   return( paste(root.dir,"cache",sep="/"))
 }
@@ -66,45 +68,34 @@ loadCacheModel <- function(root.dir= getwd()) {
   
 }
 
-loadCacheTrainingCluster <- function(root.dir= getwd()) {
-  
-  file.name <- 'trainig.cluster.ds.cache.RData'
-  file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
-  
-  if(file.exists(file.fullname)) {
-    load(file = file.fullname)
-  } else {
-    return(NULL);
-  }
-  
-  return(training.cluster.ds.cache)
-  
-}
+loadCacheTrainingRaw <- function(root.dir=getwd(), forceRemote = TRUE) {
 
-loadCacheTrainingRaw <- function(root.dir=getwd()) {
-  
   file.name <- 'training.raw.ds.cache.RData'
   file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
   
   if(file.exists(file.fullname)) {
     load(file = file.fullname)
+  } else if( forceRemote ) {
+    return(getCacheTrainingRawFromURL())
   } else {
-    return(NULL);
+    return(NULL)
   }
   
   return(training.raw.ds.cache)
   
 }
 
-loadCacheTestingRaw <- function(root.dir=getwd()) {
+loadCacheTestingRaw <- function(root.dir=getwd(), forceRemote = TRUE) {
   
   file.name <- 'testing.raw.ds.cache.RData'
   file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
   
   if(file.exists(file.fullname)) {
     load(file = file.fullname)
+  } else if( forceRemote ) {
+    return(getCacheTestingRawFromURL())
   } else {
-    return(NULL);
+    return(NULL)
   }
   
   return(testing.raw.ds.cache)
