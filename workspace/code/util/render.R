@@ -1,5 +1,5 @@
-library("grid")
-library("gridExtra")
+library(grid)
+library(gridExtra)
 library(gtable)
 
 
@@ -32,19 +32,16 @@ render.two.tables<-function(df1, title.label.1, df2, title.label.2, filename = N
   table.graph.1 <- render.table.grob(df1, title.label.1)
   table.graph.2 <- render.table.grob(df2, title.label.2)
   
-  if( ! is.null(filename)) {
-
-    h1 = grid::convertHeight(sum(table.graph.1$heights), "in", TRUE)+0.03
-    w1 = grid::convertWidth(sum(table.graph.1$widths), "in", TRUE)+0.2
-    
-    h2 = grid::convertHeight(sum(table.graph.2$heights), "in", TRUE)+0.03
-    w2 = grid::convertWidth(sum(table.graph.2$widths), "in", TRUE)+0.2
-    
-    
-    multiple.grob <- arrangeGrob(table.graph.1, table.graph.2, nrow=2)
-    
-    ggplot2::ggsave(filename, multiple.grob, width=w1, height=h1+h2+0.08)
+  h1 = grid::convertHeight(sum(table.graph.1$heights), "in", TRUE)+0.03
+  w1 = grid::convertWidth(sum(table.graph.1$widths), "in", TRUE)+0.2
   
+  h2 = grid::convertHeight(sum(table.graph.2$heights), "in", TRUE)+0.03
+  w2 = grid::convertWidth(sum(table.graph.2$widths), "in", TRUE)+0.2
+  
+  multiple.grob <- gridExtra::arrangeGrob(table.graph.1, table.graph.2, nrow=2)
+  
+  if( ! is.null(filename)) {
+      ggplot2::ggsave(filename, multiple.grob, width=w1, height=h1+h2+0.08)
   }
   
   # Do render in any case

@@ -41,13 +41,17 @@ packages<-function(x){
 #  devtools::install_github("tidyverse/ggplot2")
 # install.packages("gridExtra")
 
-setup <- function(env = parent.frame() ) {
-  
+setup <- function(env = parent.frame(), root.dir = NULL) {
+
   # Clear environment
-  rm(list=ls(envir = env), envir = env)
-  
-  # Should be the "code" folder
-  env$root.dir <- paste(getwd(),"code", sep="/")
+  rm(list = grep(ls(envir = env), pattern="root.dir", invert = TRUE, value = TRUE), envir = env)
+
+  if( !is.null(root.dir) )  {
+    env$root.dir <-root.dir
+  } else {
+    # Should be the "code" folder
+    env$root.dir <- paste(getwd(),"code", sep="/")
+  }
   
   #https://stackoverflow.com/questions/12642651/in-r-how-to-get-error-messages-in-english
   ## English messages
@@ -62,7 +66,9 @@ setup <- function(env = parent.frame() ) {
   source(paste(root.dir,"util/distribution.R",sep="/"))
   source(paste(root.dir,"input/inputLoader.R",sep="/"))
   source(paste(root.dir,"util/clusterer.R",sep="/"))
-  source(paste(root.dir,"phad-c32.R",sep="/"))  
+  source(paste(root.dir,"results/calculateResults.R",sep="/"))
+  source(paste(root.dir,"phad-c32.R",sep="/"))
+
  
 }
 
