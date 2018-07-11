@@ -9,6 +9,12 @@ source(paste(getwd(),'code/util/environment.R', sep="/"))
 # Clean environment and do environment setup tasks
 setup()
 
+#' Build the model with the input data
+#' 
+#' @param cache     Do not do any calculation, use precalculated data if it is available
+#' @param root.dir  Workspace root directory used to load cached data
+#' @param wof       If it is not NULL, indicates which feature is going to calculate by current computer.
+#' @return the trained model
 calculateModel <- function(root.dir = getwd(), cache = TRUE, wof ) {
   
   # if cache is enabled, try to load fisrt the model, if not, continue normal flow
@@ -34,6 +40,13 @@ calculateModel <- function(root.dir = getwd(), cache = TRUE, wof ) {
   
 }
 
+#' Evaluates the model with the input data (score each packet)
+#' 
+#' @model.ds        Trained model
+#' @param cache     Do not do any calculation, use precalculated data if it is available
+#' @param root.dir  Workspace root directory used to load cached data
+#' @param wof       If it is not NULL, indicates which feature is going to calculate by current computer.
+#' @return the trained model
 evaluateModel <- function(model.ds, root.dir = getwd(), cache = TRUE, wof = NULL) {
   
   # Load testing dataset
@@ -51,6 +64,13 @@ evaluateModel <- function(model.ds, root.dir = getwd(), cache = TRUE, wof = NULL
   
 }
 
+#' Extract measures from the evaluation results
+#' 
+#' @testing.raw.scored.ds  Testing data with the scoring
+#' @param cache     Do not do any calculation, use precalculated data if it is available
+#' @param root.dir  Workspace root directory used to load cached data
+#' @param wof       If it is not NULL, indicates which feature is going to calculate by current computer.
+#' @return the trained model
 measureResults <- function(testing.raw.scored.ds, root.dir = getwd(), cache = TRUE) {
 
   # Load master attack type list
@@ -88,9 +108,8 @@ logger("Calculate model")
 model.ds <- calculateModel(root.dir, cache = TRUE, wof = NULL)
 
 logger("Evaluate model")
-wof <- rep(-1,33)
-
 testing.raw.scored.ds <- evaluateModel(model.ds, root.dir, cache = TRUE, wof = NULL)
+
 logger("Measure results")
 testing.measured.ds <- measureResults(testing.raw.scored.ds, root.dir, cache)
 rm(testing.raw.scored.ds)
