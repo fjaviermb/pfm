@@ -1,4 +1,7 @@
 # pfm
+Implements an Anomaly detector based on network traffic. Based on PHAD-C32 (PHAD: Packet Header Anomaly Detection for Identifying Hostile Network Traffic).
+
+Contains tools to parser data from input cap files and the implementation of the Anomaly Detector writeen in R (net.phadc32).
 
 ## Dataset
 
@@ -39,7 +42,7 @@ pcap_scapy_generate_week.sh -w 5 -m testing -y 1999 -t inside -s \| -d friday
 
 A set of scripts to prepare raw data from original dataset. Current tools/scripts:
 
-- **install.sh**: create links in Linux binary directory: "/usr/bin"
+- **install.sh**: creates links in Linux binary directory: "/usr/bin"
 - **pcap_scapy_generate_week**: extract a week and adds in raw directory. Usage:
    ```
    pcap_scapy_generate_week.sh -w 1 -m training -y 1999 -t inside -d monday
@@ -51,18 +54,6 @@ A set of scripts to prepare raw data from original dataset. Current tools/script
    - **y|year**: year of the dataset
    - **t|type**: inside or outside (depends on dataset)
    
-- **pcap_tcpdump/pcap_tcpdump_extended**: show contents from capture in tcpdump binary format. Extended shows more fields.
-- **pacap_tcpick**: show information from a capture. Only valid for TCP packets
-- **tshark_export**:  export selected fields from a capture in tcpdump binay format. Exported fields are: ip.proto,eth.dst eth.type,eth.len,th.src,icmp.checksum, icmp.code, icmp.type, ip.checksum, ip.dst, ip.fragment, ip.frag_offset, ip.hdr_len, ip.len, ip.src, ip.tos, ip.ttl, tcp.ack, tcp.checksum, tcp.dstport, tcp.flags, tcp.hdr_len, tcp.options, tcp.seq, tcp.srcport, tcp.urgent_pointer, tcp.window_size, udp.checksum, udp.dstport, udp.length, udp.srcport
-
-**Requirements**
-"tshark" tool from WireShark mut be avilable. In case of CentOs 7, execute:
-```shell
-sudo yum install wireshark
-sudo usermod -a -G wireshark nuctools
-sudo reboot
-```
-
 **Configuration**
 Edit configuration file for base directories
 ```shell
@@ -85,7 +76,6 @@ cd [INSTALLATION DIRECTORY]\tools\capture
 sudo sh install.sh
 ```
 
-
 ## Trainig and evaluation runtime
 
 Current code is being developed using R and RStudio is used as R IDE (you can use whatever you want).
@@ -99,4 +89,14 @@ sudo rpm -i rstudio-1.1.423-x86_64.rpm
 ```
 
 ### Running code
-In the current edvelopment, the entry point (main function) is on "workspace/code/main.R"
+In the current edvelopment, the entry point (main function) is on "net.phadc32/R/main.R"
+```R
+logger("Calculate model")
+model.ds <- calculateModel(root.dir, cache = TRUE, wof = NULL)
+logger("Evaluate model")
+testing.raw.scored.ds <- evaluateModel(model.ds, root.dir, cache = TRUE, wof = NULL)
+logger("Measure results")
+testing.measured.ds <- measureResults(testing.raw.scored.ds, root.dir, cache)
+rm(testing.raw.scored.ds)
+gc()
+```
