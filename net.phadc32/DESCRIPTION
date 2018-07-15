@@ -1,0 +1,14 @@
+Package: net.phadc32
+Title: Anomaly detector using PHAD-C32 algorithm
+Type: Package
+Version: 1.0
+Authors@R: person("Francisco Javier","Motos Barragán", email = "jamoba@gmail.com", role = c("aut", "cre"))
+Author: Francisco Javier Motos Barragán
+Maintainer: Francisco Javier Motos Barragan <jamoba@gmail.com>
+Description: Implements an Anomaly detector based on network traffic. Based on PHAD-C32 (PHAD: Packet Header Anomaly Detection for Identifying Hostile Network Traffic).
+URL: https://github.com/fjaviermb/pfm
+Depends: R (>= 3.3.3)
+License: MIT
+Encoding: UTF-8
+LazyData: no
+RoxygenNote: 6.0.1
