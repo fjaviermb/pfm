@@ -41,7 +41,7 @@ setup <- function(env = parent.frame(), root.dir = NULL) {
     ),
     envir = env
   )
-  
+
   if (!is.null(root.dir))  {
     env$root.dir <- root.dir
   } else {
@@ -53,23 +53,24 @@ setup <- function(env = parent.frame(), root.dir = NULL) {
   #https://stackoverflow.com/questions/12642651/in-r-how-to-get-error-messages-in-english
   ## English messages
   Sys.setlocale("LC_MESSAGES", "C")
-  
+
   #https://stackoverflow.com/questions/9397664/force-r-not-to-use-exponential-notation-e-g-e10
   ## Avoid scientific representation. This option aids to print R command to display a number in scientific/exponential representation or not
   options("scipen" = 100, "digits" = 4)
-  
+
   # Load scripts
-  
+
   source(paste(root.dir,"util/remote.R",sep="/"))
   source(paste(root.dir, "util/environment.R", sep = "/"))
   source(paste(root.dir, "util/distribution.R", sep = "/"))
+  source(paste(root.dir, "util/render.R", sep = "/"))
   source(paste(root.dir, "cache/cacheLoader.R", sep = "/"))
   source(paste(root.dir, "input/inputLoader.R", sep = "/"))
   source(paste(root.dir, "util/clusterer.R", sep = "/"))
   source(paste(root.dir, "util/formatter.R", sep = "/"))
   source(paste(root.dir, "results/calculateResults.R", sep = "/"))
   source(paste(root.dir, "phad-c32.R", sep = "/"))
-  
+
 }
 
 
