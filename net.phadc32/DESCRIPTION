@@ -1,4 +1,4 @@
-Package: net.pfm.phadc32
+Package: net.phadc32
 Title: Anomaly detector using PHAD-C32 algorithm
 Type: Package
 Version: 1.0
