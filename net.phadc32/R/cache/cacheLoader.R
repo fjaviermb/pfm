@@ -2,21 +2,17 @@ library("tidyr")
 
 
 loadCacheModel <- function(root.dir= getwd()) {
-  
 
   file.name <- 'model.ds.cache.RData'
   file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
-  
 
   if(file.exists(file.fullname)) {
     load(file = file.fullname)
   } else {
     return(NULL);
   }
-  
 
   return(model.ds.cache)
-  
 
 }
 
@@ -24,7 +20,6 @@ loadCacheTrainingRaw <- function(root.dir=getwd(), forceRemote = TRUE) {
 
   file.name <- 'training.raw.ds.cache.RData'
   file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
-  
 
   if(file.exists(file.fullname)) {
     load(file = file.fullname)
@@ -33,19 +28,15 @@ loadCacheTrainingRaw <- function(root.dir=getwd(), forceRemote = TRUE) {
   } else {
     return(NULL)
   }
-  
 
   return(training.raw.ds.cache)
-  
 
 }
 
 loadCacheTestingRaw <- function(root.dir=getwd(), forceRemote = TRUE) {
-  
 
   file.name <- 'testing.raw.ds.cache.RData'
   file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
-  
 
   if(file.exists(file.fullname)) {
     load(file = file.fullname)
@@ -54,48 +45,38 @@ loadCacheTestingRaw <- function(root.dir=getwd(), forceRemote = TRUE) {
   } else {
     return(NULL)
   }
-  
 
   return(testing.raw.ds.cache)
-  
 
 }
 
 loadCacheLabelAttackListRaw <- function(root.dir=getwd()) {
-  
 
   file.name <- 'label.attacklist.raw.ds.cache.RData'
   file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
-  
 
   if(file.exists(file.fullname)) {
     load(file = file.fullname)
   } else {
     return(NULL);
   }
-  
 
   return(label.attacklist.raw.ds.cache)
-  
 
 }
 
 loadCacheLabelAttackTypesRaw <- function(root.dir=getwd()) {
-  
 
   file.name <- 'label.attacktypes.raw.ds.cache.RData'
   file.fullname <- paste( getCacheDir(root.dir),file.name,sep="/")
-  
 
   if(file.exists(file.fullname)) {
     load(file = file.fullname)
   } else {
     return(NULL);
   }
-  
 
   return(label.attacktypes.raw.ds.cache)
-  
 
 }
 
