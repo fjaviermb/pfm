@@ -1,0 +1,136 @@
+---
+title: "Anomaly detector based on PHAD-C32 (1999)"
+author: "Francisco Javier Motos Barragán"
+date: "July 2018"
+output:
+  html_document: default
+---
+
+
+```{r setup, include=FALSE,render=FALSE, results='hide',message=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE,fig.width=6, fig.height=4)
+root.dir <- paste(getwd(),"../../R",sep='/')
+source(paste(root.dir,'util/environment.R',sep='/'))
+setup(root.dir = root.dir)
+library(dplyr)
+library(grid)
+library(gridExtra)
+library(gtable)
+library(ggplot2)
+
+print(getDataDir(root.dir))
+
+# Load cached results
+conn <- gzfile(paste(getDataDir(root.dir),'cache/testing.measured.ds.cache.RData.gz',sep='/'))
+load(conn)
+close(conn)
+```
+
+This notebook contains the results from evaluating the model aginst the data input. Data is analised in terms of network packets or an attack. An attack represents a group of packets.
+The output of the anomlay detector is not a binary result. So, we show results using several thresholds.
+
+# Miminum threshold (scoring less or equal to 1)
+### Attack type coverage
+In this graph, we can observe how many types of attacks are detected, classified by category.
+
+```{r, Coverage, include=TRUE,render=TRUE, results='hide',message=FALSE}
+renderCoverageType(testing.measured.ds, th = 1, TRUE, savetoFile =  FALSE)
+```
+
+### Detection by packets and attacktype
+Next graph, we show the detection by packets, classified by category.
+
+```{r Detection by attack type, include=TRUE,render=TRUE, results='hide',message=FALSE}
+renderAttackTypeDetection(testing.measured.ds, th = 1, TRUE, FALSE)
+```
+
+### Detection by attack filtered by category
+On this graph, we can see the detection by attack and for specific category. Also we show a table with the Top scored attacks detected (attacks with 0 scored has been removed). 
+
+<div style="float: left; width: 50%;">
+```{r Detection by attack filtered by category, include=TRUE,render=TRUE, results='markup',message=FALSE}
+renderAttackTypeDetectionDetailed(testing.measured.ds, attackType = 'DOS', th = 1, TRUE, saveToFile = FALSE)
+```
+</div>
+<div style="float: right; width: 50%;">
+```{r include=TRUE,render=TRUE, results='markup',message=FALSE}
+renderAttackTypeDetectionDetailedTable(testing.measured.ds, attackType = 'DOS', th = 1, TRUE, saveToFile = FALSE)
+```
+</div>
+
+<div style="float: left; width: 50%;">
+```{r include=TRUE,render=TRUE, results='markup',message=FALSE}
+renderAttackTypeDetectionDetailed(testing.measured.ds, attackType = 'URA', th = 1, TRUE, saveToFile = FALSE)
+```
+</div>
+
+<div style="float: right; width: 50%;">
+```{r}
+renderAttackTypeDetectionDetailedTable(testing.measured.ds, attackType = 'URA', th = 1, TRUE, saveToFile = FALSE)
+```
+</div>
+
+<div style="float: left; width: 50%;">
+```{r}
+renderAttackTypeDetectionDetailed(testing.measured.ds, attackType = 'RLA', th = 1, TRUE, saveToFile = FALSE)
+```
+</div>
+
+<div style="float: right; width: 50%;">
+```{r}
+renderAttackTypeDetectionDetailedTable(testing.measured.ds, attackType = 'RLA', th = 1, TRUE, saveToFile = FALSE)
+```
+</div>
+
+<div style="float: left; width: 50%;">
+
+```{r}
+renderAttackTypeDetectionDetailed(testing.measured.ds, attackType = 'PRO', th = 1, TRUE, saveToFile = FALSE)
+```
+</div>
+
+<div style="float: right; width: 50%;">
+```{r}
+renderAttackTypeDetectionDetailedTable(testing.measured.ds, attackType = 'PRO', th = 1, TRUE, saveToFile = FALSE)
+```
+</div>
+
+# Analysis with other thresholds
+
+In the next sections we show the same results, but using greater threshold, so the system is less restrictive about waht they consider as an anomaly or an attack.
+
+### False Positives/Negatvives and true detections
+Render by package table False Positive/Negative and correct detections with threshold 1 and compare with threshold 20 and 37
+
+* Render by packet, False Positive/Negative and correct detections with threshold 1
+```{r Render by package table False Positive/Negative 1, include=TRUE,render=TRUE, results='hide',message=FALSE,fig.width=10, fig.height=2}
+renderFPFNTable(testing.measured.ds, threshold = 1, render = TRUE, saveToFile = FALSE)
+```
+
+* Render by packet, False Positive/Negative and correct detections comparison between threshold 1 and threshold 20
+```{r Render by package table False Positive/Negative 1-20, include=TRUE,render=TRUE, results='hide',message=FALSE,fig.width=10, fig.height=3}
+renderFPFNTableComparison(testing.measured.ds,1,20, saveToFile = FALSE)
+```
+
+* Render by packet, False Positive/Negative and correct detections comparison between threshold 1 and threshold 20
+```{r Render by package table False Positive/Negative 1-37, include=TRUE,render=TRUE, results='hide',message=FALSE,fig.width=10, fig.height=3}
+renderFPFNTableComparison(testing.measured.ds,1,37, saveToFile = FALSE)
+```
+
+### False Positives/Negatives and true detections (based on number of attacks)
+Render by number of attacks table False Positive/Negative and correct detections with threshold 1 and compare with threshold 20 and 37
+
+* Render by attack, False Positive/Negative and correct detections with threshold 1
+```{r Render by package table False Positive/Negative 1 attacks, include=TRUE,render=TRUE, results='hide',message=FALSE,fig.width=10, fig.height=2}
+renderFPFNByAttackTable(testing.measured.ds,1, render = TRUE, saveToFile = FALSE)
+```
+
+* Render by attack, False Positive/Negative and correct detections comparison between threshold 1 and threshold 20
+```{r Render by package table False Positive/Negative 2-20 attacks, include=TRUE,render=TRUE, results='hide',message=FALSE,fig.width=10, fig.height=3}
+renderFPFNByAttackTableComparison(testing.measured.ds,1,20, saveToFile = FALSE)
+```
+
+* Render by attack, False Positive/Negative and correct detections comparison between threshold 1 and threshold 37
+```{r Render by package table False Positive/Negative 2-37 attacks, include=TRUE,render=TRUE, results='hide',message=FALSE,fig.width=10, fig.height=3}
+renderFPFNByAttackTableComparison(testing.measured.ds,1,37, saveToFile = FALSE)
+```
