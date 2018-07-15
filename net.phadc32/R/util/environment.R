@@ -29,6 +29,8 @@ packages <- function(x) {
 # Current installation of ggplot2 (working):
 #  devtools::install_github("tidyverse/ggplot2")
 # install.packages("gridExtra")
+# Next package is just for generating documentation
+# install.packages("roxygen2")
 
 setup <- function(env = parent.frame(), root.dir = NULL) {
   # Clear environment
